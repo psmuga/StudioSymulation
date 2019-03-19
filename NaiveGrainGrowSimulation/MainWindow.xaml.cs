@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
@@ -21,9 +22,11 @@ namespace NaiveGrainGrowSimulation
     public partial class MainWindow : Window
     {
         private readonly Settings _settings;
-        private Random _rand;
+        private readonly Random _rand;
         private List<Brush> _idUsedColors;
         private List<Brush> _usedColors;
+        private Rectangle[,] _fields;
+        private Brush[,] _tempBrushes;
 
         public MainWindow()
         {
@@ -35,7 +38,7 @@ namespace NaiveGrainGrowSimulation
 
             
 
-            InitializeBoard();
+            //InitializeBoard();
         }
 
         private void InitializeSettings()
@@ -50,19 +53,49 @@ namespace NaiveGrainGrowSimulation
             _idUsedColors = new List<Brush>();
             _usedColors = new List<Brush>
             {
-                Brushes.Cyan
+                Brushes.White,
+                Brushes.Cyan,
+                Brushes.Black
             };
 
             BoardCanvas.Children.Clear();
 
-            for (int i = 0; i < _settings.GrainNumber; i++)
+            for (var i = 0; i < _settings.GrainNumber; i++)
             {
                 _idUsedColors.Add(GetRandomBrush());
             }
 
-            //SetResponsiveCanvas();
+            _fields = new Rectangle[_settings.NetHeight,_settings.NetWidth];
+            _tempBrushes = new Brush[_settings.NetHeight, _settings.NetWidth];
 
 
+            FirstColorSystem();
+
+
+        }
+
+        //do usunięcia
+        private void FirstColorSystem()
+        {
+            var brushesType = typeof(Brushes);
+            var properties = brushesType.GetProperties();
+
+            for (int i = 0; i < _settings.NetHeight; i++)
+            {
+                for (int j = 0; j < _settings.NetWidth; j++)
+                {
+                    var r = new Rectangle();
+                    r.Width = _settings.CellSize;
+                    r.Height = _settings.CellSize;
+
+                    var tempId = _rand.Next(_settings.GrainNumber);
+                    r.Fill = (Brush)properties[tempId].GetValue(null, null);
+                    BoardCanvas.Children.Add(r);
+                    Canvas.SetLeft(r, j * _settings.CellSize);
+                    Canvas.SetTop(r, i * _settings.CellSize);
+                    _fields[i, j] = r;
+                }
+            }
         }
 
         private Brush GetRandomBrush()
@@ -82,8 +115,6 @@ namespace NaiveGrainGrowSimulation
 
         private void SetResponsiveCanvas()
         {
-           //skrajne wartośći 10/50 np wyrzuca poza ekran
-
             int h = (int) RowDefinitionCanvas.ActualHeight;
             int w = (int) (MyWindow.ActualWidth-20);
 
@@ -94,7 +125,7 @@ namespace NaiveGrainGrowSimulation
                 do
                 {
                     size--;
-                } while (size * _settings.NetWidth > (MyWindow.ActualWidth-30));
+                } while (size * _settings.NetWidth > (MyWindow.ActualWidth-40));
             }
             else
             {
@@ -106,13 +137,11 @@ namespace NaiveGrainGrowSimulation
                 } while ((size* _settings.NetHeight) > RowDefinitionCanvas.ActualHeight-20);
 
             }
-            
-
-
             BoardCanvas.Height = size * _settings.NetHeight;
             BoardCanvas.Width = size * _settings.NetWidth;
             _settings.CellSize = size;
         }
+
         private void SetNumbersOfGrains()
         {
             if (int.TryParse(GrainNumbersTextBox.Text, out int inputGrains))
@@ -156,19 +185,59 @@ namespace NaiveGrainGrowSimulation
             }
         }
 
-        private void GrainNumbersTextBox_TextChanged(object sender, TextChangedEventArgs e) => SetNumbersOfGrains();
-
-        private void NetWidthTextBox_TextChanged(object sender, TextChangedEventArgs e) => SetNetWidth();
-
-        private void NetHightTextBox_TextChanged(object sender, TextChangedEventArgs e) => SetNetHeight();
-
         private void StartButton_Click(object sender, RoutedEventArgs e)
         {
-            SetResponsiveCanvas();
+            InitializeBoard();
+
+            PauseButton.IsEnabled = !PauseButton.IsEnabled;
+            StartButton.IsEnabled = !StartButton.IsEnabled;
+            ClearButton.IsEnabled = false;
+            FitButton.IsEnabled = false;
         }
 
         //save button from settings
         private void Button_Click(object sender, RoutedEventArgs e)
+        {
+            ClearButton_Click(sender,e);
+
+            SetNetHeight();
+            SetNetWidth();
+            SetNumbersOfGrains();
+
+            
+            SetResponsiveCanvas();
+        }
+
+        private void PauseButton_Click(object sender, RoutedEventArgs e)
+        {
+            StartButton.IsEnabled = true;
+            PauseButton.IsEnabled = !PauseButton.IsEnabled;
+            ClearButton.IsEnabled = true;
+        }
+
+        private void ClearButton_Click(object sender, RoutedEventArgs e)
+        {
+            FitButton.IsEnabled = true;
+            ClearButton.IsEnabled = false;
+            StartButton.IsEnabled = true;
+            PauseButton.IsEnabled = false;
+
+            ClearBoard();
+        }
+
+        private void FitButton_Click(object sender, RoutedEventArgs e)
+        {
+            SetResponsiveCanvas();
+        }
+
+        private void ClearBoard()
+        {
+            //SolidColorBrush mycolor = new SolidColorBrush();
+            //mycolor.Color = Color.FromRgb(229,229,229);
+            BoardCanvas.Children.Clear();
+        }
+
+        private void BoardCanvas_Loaded(object sender, RoutedEventArgs e)
         {
             SetResponsiveCanvas();
         }
