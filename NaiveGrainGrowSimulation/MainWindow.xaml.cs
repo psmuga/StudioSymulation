@@ -23,10 +23,8 @@ namespace NaiveGrainGrowSimulation
     {
         private readonly Settings _settings;
         private readonly Random _rand;
-        private List<Brush> _idUsedColors;
-        private List<Brush> _usedColors;
-        private Rectangle[,] _fields;
-        private Brush[,] _tempBrushes;
+        private Cell[,] _fields;
+
 
         public MainWindow()
         {
@@ -35,7 +33,7 @@ namespace NaiveGrainGrowSimulation
 
             InitializeComponent();
             InitializeSettings();
-
+            InitialiseTable();
             
 
             //InitializeBoard();
@@ -48,70 +46,56 @@ namespace NaiveGrainGrowSimulation
             NetWidthTextBox.Text = _settings.NetWidth.ToString();
         }
 
+        private void InitialiseTable()
+        {
+            _fields = new Cell[_settings.NetHeight, _settings.NetWidth];
+            for (int i = 0; i < _settings.NetHeight; i++)
+            {
+                for (int j = 0; j < _settings.NetWidth; j++)
+                {
+                    _fields[i, j] = new Cell();
+                }
+            }
+        }
+        //perform simulation
         private void InitializeBoard()
         {
-            _idUsedColors = new List<Brush>();
-            _usedColors = new List<Brush>
-            {
-                Brushes.White,
-                Brushes.Cyan,
-                Brushes.Black
-            };
+            
 
-            BoardCanvas.Children.Clear();
-
-            for (var i = 0; i < _settings.GrainNumber; i++)
-            {
-                _idUsedColors.Add(GetRandomBrush());
-            }
-
-            _fields = new Rectangle[_settings.NetHeight,_settings.NetWidth];
-            _tempBrushes = new Brush[_settings.NetHeight, _settings.NetWidth];
-
+            ClearBoard();
 
             FirstColorSystem();
-
-
         }
 
         //do usunięcia
         private void FirstColorSystem()
         {
-            var brushesType = typeof(Brushes);
-            var properties = brushesType.GetProperties();
+            var index = 0;
 
-            for (int i = 0; i < _settings.NetHeight; i++)
+            while (index<_settings.GrainNumber)
             {
-                for (int j = 0; j < _settings.NetWidth; j++)
+                var i = _rand.Next(_settings.NetHeight - 1);
+                var j = _rand.Next(_settings.NetWidth - 1);
+                if (_fields[i,j].Stan ==false)
                 {
                     var r = new Rectangle();
                     r.Width = _settings.CellSize;
                     r.Height = _settings.CellSize;
+                    var color = new SolidColorBrush(GetRandomColor());
+                    r.Fill = color;
+                    _fields[i, j].MyRectangle = r;// SetRectangle(r);
+                    _fields[i, j].MyBrush = color;
 
-                    var tempId = _rand.Next(_settings.GrainNumber);
-                    r.Fill = (Brush)properties[tempId].GetValue(null, null);
-                    BoardCanvas.Children.Add(r);
-                    Canvas.SetLeft(r, j * _settings.CellSize);
-                    Canvas.SetTop(r, i * _settings.CellSize);
-                    _fields[i, j] = r;
+
+                    BoardCanvas.Children.Add(_fields[i, j].MyRectangle);
+                    Canvas.SetLeft(_fields[i, j].MyRectangle, j * _settings.CellSize);
+                    Canvas.SetTop(_fields[i, j].MyRectangle, i * _settings.CellSize);
+                    index++;
+                    _fields[i, j].Stan = true;
                 }
             }
         }
 
-        private Brush GetRandomBrush()
-        {
-            var properties = typeof(Brushes).GetProperties();
-            while (true)
-            {
-                var random = _rand.Next(properties.Length);
-                var result = (Brush) properties[random].GetValue(null, null);
-                if (!_usedColors.Contains(result))
-                {
-                    return result;
-                }
-            }
-
-        }
 
         private void SetResponsiveCanvas()
         {
@@ -188,6 +172,7 @@ namespace NaiveGrainGrowSimulation
         private void StartButton_Click(object sender, RoutedEventArgs e)
         {
             InitializeBoard();
+            InitialiseTable();
 
             PauseButton.IsEnabled = !PauseButton.IsEnabled;
             StartButton.IsEnabled = !StartButton.IsEnabled;
@@ -204,7 +189,8 @@ namespace NaiveGrainGrowSimulation
             SetNetWidth();
             SetNumbersOfGrains();
 
-            
+            InitialiseTable();
+
             SetResponsiveCanvas();
         }
 
@@ -223,6 +209,7 @@ namespace NaiveGrainGrowSimulation
             PauseButton.IsEnabled = false;
 
             ClearBoard();
+            
         }
 
         private void FitButton_Click(object sender, RoutedEventArgs e)
@@ -232,14 +219,20 @@ namespace NaiveGrainGrowSimulation
 
         private void ClearBoard()
         {
-            //SolidColorBrush mycolor = new SolidColorBrush();
-            //mycolor.Color = Color.FromRgb(229,229,229);
+
             BoardCanvas.Children.Clear();
+
         }
+
 
         private void BoardCanvas_Loaded(object sender, RoutedEventArgs e)
         {
             SetResponsiveCanvas();
+        }
+
+        private Color GetRandomColor()
+        {
+            return Color.FromRgb((byte) _rand.Next(255),(byte) _rand.Next(255), (byte) _rand.Next(255));
         }
     }
 }
