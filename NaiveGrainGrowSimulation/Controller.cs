@@ -25,10 +25,10 @@ namespace NaiveGrainGrowSimulation
 
         public void InitialiseTable()
         {
-            _fields = new Cell[_settings.NetHeight, _settings.NetWidth];
-            for (int i = 0; i < _settings.NetHeight; i++)
+            _fields = new Cell[_settings.NetHeight+2, _settings.NetWidth+2];
+            for (int i = 0; i < _settings.NetHeight+2; i++)
             {
-                for (int j = 0; j < _settings.NetWidth; j++)
+                for (int j = 0; j < _settings.NetWidth+2; j++)
                 {
                     _fields[i, j] = new Cell();
                 }
@@ -41,8 +41,8 @@ namespace NaiveGrainGrowSimulation
 
             while (index < _settings.GrainNumber)
             {
-                var i = _rand.Next(_settings.NetHeight - 1);
-                var j = _rand.Next(_settings.NetWidth - 1);
+                var i = _rand.Next(_settings.NetHeight)+1;
+                var j = _rand.Next(_settings.NetWidth )+1;
                 if (_fields[i, j].Stan == false)
                 {
                     var r = new Rectangle();
@@ -55,12 +55,13 @@ namespace NaiveGrainGrowSimulation
 
 
                     _boardCanvas.Children.Add(_fields[i, j].MyRectangle);
-                    Canvas.SetLeft(_fields[i, j].MyRectangle, j * _settings.CellSize);
-                    Canvas.SetTop(_fields[i, j].MyRectangle, i * _settings.CellSize);
+                    Canvas.SetLeft(_fields[i, j].MyRectangle, (j-1) * _settings.CellSize);
+                    Canvas.SetTop(_fields[i, j].MyRectangle, (i-1) * _settings.CellSize);
                     index++;
                     _fields[i, j].Stan = true;
                 }
             }
+            //Console.WriteLine("Ff");
         }
 
         private Color GetRandomColor()
