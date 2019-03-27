@@ -12,5 +12,6 @@ namespace NaiveGrainGrowSimulation
         public int NetHeight { get; set; } = 50;
         public int NetWidth { get; set; } = 50;
         public int CellSize { get; set; }
+        public int CellSpace { get; set; }
     }
 }

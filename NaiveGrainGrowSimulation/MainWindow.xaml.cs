@@ -19,12 +19,13 @@ namespace NaiveGrainGrowSimulation
     /// <summary>
     /// Interaction logic for MainWindow.xaml
     /// </summary>
+    /// 
     public partial class MainWindow : Window
     {
         private readonly Settings _settings;
         private readonly Controller _controller;
 
-
+        private GrainGrow _option = GrainGrow.Random;
 
         public MainWindow()
         {
@@ -55,7 +56,15 @@ namespace NaiveGrainGrowSimulation
         {
             ClearBoard();
 
-            _controller.RandomGrain();
+            if (_option==GrainGrow.Random)
+            {
+                _controller.RandomGrain();
+            }
+            else
+            {
+                _controller.EvenGrain();
+            }
+
         }
 
         
@@ -101,6 +110,21 @@ namespace NaiveGrainGrowSimulation
                 SimulationTab.IsEnabled = false;
                 MessageBox.Show("Wrong numbers of grains!");
                 
+            }
+        }
+
+        private void SetCellSpace()
+        {
+            if (int.TryParse(CellSpaceTextBox.Text, out int cellSpace))
+            {
+                _settings.CellSpace = cellSpace;
+                SimulationTab.IsEnabled = true;
+            }
+            else
+            {
+                SimulationTab.IsEnabled = false;
+                MessageBox.Show("Wrong numbers of cell space!");
+
             }
         }
 
@@ -155,6 +179,18 @@ namespace NaiveGrainGrowSimulation
             _controller.InitialiseTable();
 
             SetResponsiveCanvas();
+
+
+            if (EvenGrainGrowRadioButton.IsChecked == true)
+            {
+                SetCellSpace();
+                _option = GrainGrow.Even;
+            }
+            else
+            {
+                _option = GrainGrow.Random;
+            }
+
         }
 
         private void PauseButton_Click(object sender, RoutedEventArgs e)

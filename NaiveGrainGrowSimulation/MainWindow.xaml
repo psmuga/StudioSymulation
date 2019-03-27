@@ -42,7 +42,7 @@
                     </Grid.ColumnDefinitions>
                     <Grid.RowDefinitions>
                         <RowDefinition Height="*"></RowDefinition>
-                        <RowDefinition Height="3*"></RowDefinition>
+                        <RowDefinition Height="2*"></RowDefinition>
                     </Grid.RowDefinitions>
 
                     <Grid Grid.Row="0" Grid.Column="0" Margin="10">
@@ -81,21 +81,30 @@
                             <RowDefinition Height="Auto"></RowDefinition>
                             <RowDefinition Height="Auto"></RowDefinition>
                             <RowDefinition Height="Auto"></RowDefinition>
+                            <RowDefinition Height="Auto"></RowDefinition>
+                            <RowDefinition Height="Auto"></RowDefinition>
                             <RowDefinition Height="*"></RowDefinition>
                         </Grid.RowDefinitions>
 
                         <Label Content="General Settings" Grid.Column="0" HorizontalAlignment="Left" Margin="0,0,0,0" Grid.Row="0" Grid.ColumnSpan="3" VerticalAlignment="Top" FontWeight="Bold" FontSize="14" />
 
-                        <Label  Grid.Column="0" Grid.Row="1"  Content="Number of grains" HorizontalAlignment="Center"  VerticalAlignment="Center" Width="Auto" Margin="10,10,0,10"/>
+                        
 
-                        <Rectangle Grid.ColumnSpan="2" Grid.Row="1" Grid.RowSpan="2"   Fill="#FFF4F4F5"   Stroke="Black" Panel.ZIndex="-1" StrokeThickness="3" Opacity="0.5"/>
+                        <!--<Rectangle Grid.ColumnSpan="2" Grid.Row="1" Grid.RowSpan="2"   Fill="#FFF4F4F5"   Stroke="Black" Panel.ZIndex="-1" StrokeThickness="3" Opacity="0.5"/>-->
 
-                        <TextBox x:Name="GrainNumbersTextBox" Grid.Column="1" Height="20"  Grid.Row="1" TextWrapping="Wrap"  VerticalAlignment="Center"  Margin="2,10,10,10" TextAlignment="Center"/>
+                        
+
+                        <RadioButton x:Name="RandomGrainGrowRadioButton" Grid.Row="1" GroupName="GrainGrowMethod" IsChecked="True">Random Grain</RadioButton>
+                        <Label  Grid.Column="0" Grid.Row="2"  Content="Number of grains" HorizontalAlignment="Center"  VerticalAlignment="Center" Width="Auto" Margin="10,10,0,10"/>
+                        <TextBox x:Name="GrainNumbersTextBox" Grid.Column="1" Height="20"  Grid.Row="2" TextWrapping="Wrap"  VerticalAlignment="Center"  Margin="2,10,10,10" TextAlignment="Center"/>
+                        <RadioButton x:Name="EvenGrainGrowRadioButton" Grid.Row="3" GroupName="GrainGrowMethod">Even space Grain</RadioButton>
+                        <Label  Grid.Column="0" Grid.Row="4"  Content="Cells space" HorizontalAlignment="Center"  VerticalAlignment="Center" Width="Auto" Margin="10,10,0,10"/>
+                        <TextBox x:Name="CellSpaceTextBox" Grid.Column="1" Height="20"  Grid.Row="4" TextWrapping="Wrap"  VerticalAlignment="Center"  Margin="2,10,10,10" TextAlignment="Center" Text="1"/>
                     </Grid>
                     <Button Content="Save" Grid.Column="3" Grid.Row="1" HorizontalAlignment="Right" Margin="0,0,10,10" VerticalAlignment="Bottom" Width="100" Height="50" Click="Button_Click"/>
 
 
-
+                   
 
                 </Grid>
             </TabItem>

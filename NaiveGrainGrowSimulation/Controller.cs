@@ -61,7 +61,29 @@ namespace NaiveGrainGrowSimulation
                     _fields[i, j].Stan = true;
                 }
             }
-            //Console.WriteLine("Ff");
+        }
+
+        public void EvenGrain()
+        {
+            for (int i = 1; i < _settings.NetHeight+1; i+=_settings.CellSpace)
+            {
+                for (int j = 1; j < _settings.NetWidth+1; j+=_settings.CellSpace)
+                {
+                    var r = new Rectangle();
+                    r.Width = _settings.CellSize;
+                    r.Height = _settings.CellSize;
+                    var color = new SolidColorBrush(GetRandomColor());
+                    r.Fill = color;
+                    _fields[i, j].MyRectangle = r;
+                    _fields[i, j].MyBrush = color;
+
+
+                    _boardCanvas.Children.Add(_fields[i, j].MyRectangle);
+                    Canvas.SetLeft(_fields[i, j].MyRectangle, (j - 1) * _settings.CellSize);
+                    Canvas.SetTop(_fields[i, j].MyRectangle, (i - 1) * _settings.CellSize);
+                    _fields[i, j].Stan = true;
+                }
+            }
         }
 
         private Color GetRandomColor()

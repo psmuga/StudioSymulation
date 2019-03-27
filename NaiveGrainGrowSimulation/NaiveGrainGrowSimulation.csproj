@@ -57,6 +57,7 @@
     </ApplicationDefinition>
     <Compile Include="Cell.cs" />
     <Compile Include="Controller.cs" />
+    <Compile Include="GrainGrow.cs" />
     <Compile Include="Settings.cs" />
     <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
