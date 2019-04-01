@@ -23,7 +23,7 @@
                         <RowDefinition x:Name="RowDefinitionCanvas" Height="15*"></RowDefinition>
                     </Grid.RowDefinitions>
 
-                    <Canvas x:Name="BoardCanvas" Margin="10" Grid.Row="1"  Background="White"  Grid.ColumnSpan="5" Focusable="True" Loaded="BoardCanvas_Loaded" />
+                    <Canvas x:Name="BoardCanvas" Margin="10" Grid.Row="1"  Background="White"  Grid.ColumnSpan="5" Focusable="True" Loaded="BoardCanvas_Loaded" MouseDown="BoardCanvas_MouseDown" />
                     <Button x:Name="StartButton" Content="Start" Margin="10,10,0,0"   Grid.Column="0" Click="StartButton_Click"/>
                     <Button x:Name="PauseButton" Content="Pause" Margin="10,10,0,0"  Grid.Column="1" IsEnabled="False" Click="PauseButton_Click"/>
                     <Button x:Name="ClearButton" Content="Clear" Margin="10,10,0,0"  Grid.Column="2" IsEnabled="False" Click="ClearButton_Click"/>
@@ -38,11 +38,10 @@
                         <ColumnDefinition></ColumnDefinition>
                         <ColumnDefinition></ColumnDefinition>
                         <ColumnDefinition></ColumnDefinition>
-                        <ColumnDefinition></ColumnDefinition>
                     </Grid.ColumnDefinitions>
                     <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"></RowDefinition>
                         <RowDefinition Height="*"></RowDefinition>
-                        <RowDefinition Height="2*"></RowDefinition>
                     </Grid.RowDefinitions>
 
                     <Grid Grid.Row="0" Grid.Column="0" Margin="10">
@@ -83,6 +82,8 @@
                             <RowDefinition Height="Auto"></RowDefinition>
                             <RowDefinition Height="Auto"></RowDefinition>
                             <RowDefinition Height="Auto"></RowDefinition>
+                            <RowDefinition Height="Auto"></RowDefinition>
+                            <RowDefinition Height="Auto"></RowDefinition>
                             <RowDefinition Height="*"></RowDefinition>
                         </Grid.RowDefinitions>
 
@@ -94,14 +95,22 @@
 
                         
 
-                        <RadioButton x:Name="RandomGrainGrowRadioButton" Grid.Row="1" GroupName="GrainGrowMethod" IsChecked="True">Random Grain</RadioButton>
+                        <RadioButton x:Name="RandomGrainGrowRadioButton" Grid.Row="1" GroupName="GrainGrowMethod" IsChecked="True">Random grain</RadioButton>
                         <Label  Grid.Column="0" Grid.Row="2"  Content="Number of grains" HorizontalAlignment="Center"  VerticalAlignment="Center" Width="Auto" Margin="10,10,0,10"/>
                         <TextBox x:Name="GrainNumbersTextBox" Grid.Column="1" Height="20"  Grid.Row="2" TextWrapping="Wrap"  VerticalAlignment="Center"  Margin="2,10,10,10" TextAlignment="Center"/>
-                        <RadioButton x:Name="EvenGrainGrowRadioButton" Grid.Row="3" GroupName="GrainGrowMethod">Even space Grain</RadioButton>
+                        
+                        <RadioButton x:Name="EvenGrainGrowRadioButton" Grid.Row="3" GroupName="GrainGrowMethod">Even space grain</RadioButton>
                         <Label  Grid.Column="0" Grid.Row="4"  Content="Cells space" HorizontalAlignment="Center"  VerticalAlignment="Center" Width="Auto" Margin="10,10,0,10"/>
                         <TextBox x:Name="CellSpaceTextBox" Grid.Column="1" Height="20"  Grid.Row="4" TextWrapping="Wrap"  VerticalAlignment="Center"  Margin="2,10,10,10" TextAlignment="Center" Text="1"/>
+
+                        <RadioButton x:Name="ClickPointGrowRadioButton" Grid.Row="5" GroupName="GrainGrowMethod">Point by click</RadioButton>
+
+                        <RadioButton x:Name="RandomWithRadiusGrowRadioButton" Grid.Row="6" GroupName="GrainGrowMethod">Random with radius grain</RadioButton>
+                        <Label  Grid.Column="0" Grid.Row="7"  Content="Cells space" HorizontalAlignment="Center"  VerticalAlignment="Center" Width="Auto" Margin="10,10,0,10"/>
+                        <TextBox x:Name="RandomWithRadiusTextBox" Grid.Column="1" Height="20"  Grid.Row="7" TextWrapping="Wrap"  VerticalAlignment="Center"  Margin="2,10,10,10" TextAlignment="Center" Text="3"/>
+
                     </Grid>
-                    <Button Content="Save" Grid.Column="3" Grid.Row="1" HorizontalAlignment="Right" Margin="0,0,10,10" VerticalAlignment="Bottom" Width="100" Height="50" Click="Button_Click"/>
+                    <Button Content="Save" Grid.Column="2" Grid.Row="1" HorizontalAlignment="Right" Margin="0,0,10,10" VerticalAlignment="Bottom" Width="100" Height="50" Click="Button_Click"/>
 
 
                    

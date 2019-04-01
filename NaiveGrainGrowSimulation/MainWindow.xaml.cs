@@ -22,10 +22,13 @@ namespace NaiveGrainGrowSimulation
     /// 
     public partial class MainWindow : Window
     {
+        
         private readonly Settings _settings;
         private readonly Controller _controller;
 
         private GrainGrow _option = GrainGrow.Random;
+
+        private static int addedGrainNumber = 0;
 
         public MainWindow()
         {
@@ -56,18 +59,24 @@ namespace NaiveGrainGrowSimulation
         {
             ClearBoard();
 
-            if (_option==GrainGrow.Random)
+            switch (_option)
             {
-                _controller.RandomGrain();
+                case GrainGrow.Random:
+                    _controller.RandomGrain();
+                    break;
+                case GrainGrow.Even:
+                    _controller.EvenGrain();
+                    break;
+                case GrainGrow.Click:
+                   // _controller.PointByClick();
+                    break;
+                case GrainGrow.Radius:
+                    _controller.RandomWithRadius();
+                    break;
             }
-            else
-            {
-                _controller.EvenGrain();
-            }
-
         }
 
-        
+
 
         private void SetResponsiveCanvas()
         {
@@ -186,9 +195,17 @@ namespace NaiveGrainGrowSimulation
                 SetCellSpace();
                 _option = GrainGrow.Even;
             }
-            else
+            else if (RandomGrainGrowRadioButton.IsChecked ==true)
             {
                 _option = GrainGrow.Random;
+            }
+            else if (ClickPointGrowRadioButton.IsChecked ==true)
+            {
+                _option = GrainGrow.Click;
+            }
+            else if (RandomWithRadiusGrowRadioButton.IsChecked == true)
+            {
+                _option = GrainGrow.Radius;
             }
 
         }
@@ -207,6 +224,8 @@ namespace NaiveGrainGrowSimulation
             StartButton.IsEnabled = true;
             PauseButton.IsEnabled = false;
 
+
+            addedGrainNumber = 0;
             ClearBoard();
             
         }
@@ -229,6 +248,19 @@ namespace NaiveGrainGrowSimulation
             SetResponsiveCanvas();
         }
 
+        private void BoardCanvas_MouseDown(object sender, MouseButtonEventArgs e)
+        {
+            if (addedGrainNumber < _settings.GrainNumber && _option==GrainGrow.Click)
+            {
+                var p = e.GetPosition(BoardCanvas);
+                Console.WriteLine($"{p.X} , {p.Y}");
 
+                _controller.PointByClick(p);
+
+                addedGrainNumber++;
+            }
+
+            
+        }
     }
 }

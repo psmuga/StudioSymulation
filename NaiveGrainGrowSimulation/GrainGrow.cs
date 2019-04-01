@@ -3,6 +3,8 @@ namespace NaiveGrainGrowSimulation
     enum GrainGrow
     {
         Random,
-        Even
+        Even,
+        Click,
+        Radius
     }
 }
