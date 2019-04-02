@@ -28,7 +28,7 @@ namespace NaiveGrainGrowSimulation
 
         private GrainGrow _option = GrainGrow.Random;
 
-        private static int addedGrainNumber = 0;
+        private static int _addedGrainNumber = 0;
 
         public MainWindow()
         {
@@ -51,6 +51,7 @@ namespace NaiveGrainGrowSimulation
             GrainNumbersTextBox.Text = _settings.GrainNumber.ToString();
             NetHightTextBox.Text = _settings.NetHeight.ToString();
             NetWidthTextBox.Text = _settings.NetWidth.ToString();
+            RandomWithRadiusTextBox.Text = _settings.Radius.ToString();
         }
 
 
@@ -165,6 +166,20 @@ namespace NaiveGrainGrowSimulation
             }
         }
 
+        private void SetRadius()
+        {
+            if (int.TryParse(RandomWithRadiusTextBox.Text, out int radius))
+            {
+                _settings.Radius = radius;
+                SimulationTab.IsEnabled = true;
+            }
+            else
+            {
+                SimulationTab.IsEnabled = false;
+                MessageBox.Show("Wrong radius parameter!");
+            }
+        }
+
         private void StartButton_Click(object sender, RoutedEventArgs e)
         {
             InitializeBoard();
@@ -184,6 +199,7 @@ namespace NaiveGrainGrowSimulation
             SetNetHeight();
             SetNetWidth();
             SetNumbersOfGrains();
+            SetRadius();
 
             _controller.InitialiseTable();
 
@@ -219,13 +235,15 @@ namespace NaiveGrainGrowSimulation
 
         private void ClearButton_Click(object sender, RoutedEventArgs e)
         {
+            //_controller.ResetTable();
             FitButton.IsEnabled = true;
             ClearButton.IsEnabled = false;
             StartButton.IsEnabled = true;
             PauseButton.IsEnabled = false;
 
 
-            addedGrainNumber = 0;
+            _addedGrainNumber = 0;
+            
             ClearBoard();
             
         }
@@ -250,14 +268,13 @@ namespace NaiveGrainGrowSimulation
 
         private void BoardCanvas_MouseDown(object sender, MouseButtonEventArgs e)
         {
-            if (addedGrainNumber < _settings.GrainNumber && _option==GrainGrow.Click)
+            if (_addedGrainNumber < _settings.GrainNumber && _option==GrainGrow.Click)
             {
                 var p = e.GetPosition(BoardCanvas);
-                Console.WriteLine($"{p.X} , {p.Y}");
 
                 _controller.PointByClick(p);
 
-                addedGrainNumber++;
+                _addedGrainNumber++;
             }
 
             
