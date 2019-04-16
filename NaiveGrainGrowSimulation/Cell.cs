@@ -15,6 +15,8 @@ namespace NaiveGrainGrowSimulation
         public Brush MyBrush { get; set; }
         public bool Stan { get; set; }
 
+        public byte Orientation { get; set; } = 0;
+
         public Cell()
         {
             Stan = false;
@@ -23,30 +25,6 @@ namespace NaiveGrainGrowSimulation
             MyBrush = new SolidColorBrush(Colors.White);
         }
 
-        public Rectangle GetRectangle()
-        {
-            return MyRectangle;
-        }
 
-        public void CleanCell()
-        {
-            MyRectangle.Fill = new SolidColorBrush(Colors.White);
-            Stan = false;
-        }
-
-        //public Brush GetBrush()
-        //{
-        //    return MyBrush;
-        //}
-
-        //public void SetRectangle(Rectangle r)
-        //{
-        //    this.MyRectangle = r;
-        //}
-
-        //public void SetBrush(Brush b)
-        //{
-        //    this.MyBrush = b;
-        //}
     }
 }

@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
@@ -13,6 +15,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using Microsoft.Win32;
 
 namespace NaiveGrainGrowSimulation
 {
@@ -23,25 +26,23 @@ namespace NaiveGrainGrowSimulation
     public partial class MainWindow : Window
     {
         
-        private readonly Settings _settings;
-        private readonly Controller _controller;
+        private Settings _settings;
+        private Controller _controller;
 
-        private GrainGrow _option = GrainGrow.Random;
+        
 
         private static int _addedGrainNumber = 0;
+        private bool _allSteps = false;
+
 
         public MainWindow()
         {
             _settings = new Settings();
             
-
+            InitializeController();
 
             InitializeComponent();
             InitializeSettings();
-
-            _controller = new Controller(_settings, BoardCanvas);
-            _controller.InitialiseTable();
-            
 
             //InitializeBoard();
         }
@@ -52,15 +53,38 @@ namespace NaiveGrainGrowSimulation
             NetHightTextBox.Text = _settings.NetHeight.ToString();
             NetWidthTextBox.Text = _settings.NetWidth.ToString();
             RandomWithRadiusTextBox.Text = _settings.Radius.ToString();
-        }
+            CellSpaceTextBox.Text = _settings.CellSpace.ToString();
 
+            TypeComboBox.SelectedIndex = (int) _settings.NeighborhoodType;
+            EdgeComboBox.SelectedIndex = (int) _settings.EdgeCondition;
+
+            switch (_settings.Option)
+            {
+                case GrainGrow.Random:
+                    RandomGrainGrowRadioButton.IsChecked = true;
+                    break;
+                case GrainGrow.Even:
+                    EvenGrainGrowRadioButton.IsChecked = true;
+                    break;
+                case GrainGrow.Click:
+                    ClickPointGrowRadioButton.IsChecked = true;
+                    break;
+                case GrainGrow.Radius:
+                    RandomWithRadiusGrowRadioButton.IsChecked = true;
+                    break;
+                default:
+                    RandomGrainGrowRadioButton.IsChecked = true;
+                    break;
+            }
+        }
 
         //perform simulation
         private void InitializeBoard()
         {
             ClearBoard();
+            InitializeController();
 
-            switch (_option)
+            switch (_settings.Option)
             {
                 case GrainGrow.Random:
                     _controller.RandomGrain();
@@ -77,6 +101,12 @@ namespace NaiveGrainGrowSimulation
             }
         }
 
+
+        private void InitializeController()
+        {
+            _controller = new Controller(_settings, BoardCanvas);
+            _controller.InitialiseTable();
+        }
 
 
         private void SetResponsiveCanvas()
@@ -180,15 +210,28 @@ namespace NaiveGrainGrowSimulation
             }
         }
 
+        private void SetEdgeType()
+        {
+            _settings.EdgeCondition = (EdgeCondition) EdgeComboBox.SelectionBoxItem;
+        }
+
+        private void SetNeighborhoodType()
+        {
+            _settings.NeighborhoodType = (NeighborhoodType) TypeComboBox.SelectedIndex;
+        }
+
         private void StartButton_Click(object sender, RoutedEventArgs e)
         {
+           
+           // _controller.InitialiseTable();
             InitializeBoard();
-            _controller.InitialiseTable();
 
             PauseButton.IsEnabled = !PauseButton.IsEnabled;
             StartButton.IsEnabled = !StartButton.IsEnabled;
             ClearButton.IsEnabled = false;
             FitButton.IsEnabled = false;
+
+          //  _controller.PerformMooreIteration();
         }
 
         //save button from settings
@@ -200,30 +243,39 @@ namespace NaiveGrainGrowSimulation
             SetNetWidth();
             SetNumbersOfGrains();
             SetRadius();
+            SetEdgeType();
+            SetNeighborhoodType();
 
-            _controller.InitialiseTable();
+           // _controller.InitialiseTable();
 
             SetResponsiveCanvas();
 
+            
+            SetStepOption();
 
             if (EvenGrainGrowRadioButton.IsChecked == true)
             {
                 SetCellSpace();
-                _option = GrainGrow.Even;
+                _settings.Option = GrainGrow.Even;
             }
             else if (RandomGrainGrowRadioButton.IsChecked ==true)
             {
-                _option = GrainGrow.Random;
+                _settings.Option = GrainGrow.Random;
             }
             else if (ClickPointGrowRadioButton.IsChecked ==true)
             {
-                _option = GrainGrow.Click;
+                _settings.Option = GrainGrow.Click;
             }
             else if (RandomWithRadiusGrowRadioButton.IsChecked == true)
             {
-                _option = GrainGrow.Radius;
+                _settings.Option = GrainGrow.Radius;
             }
 
+        }
+
+        private void SetStepOption()
+        {
+            _allSteps = AllStepRadioButton.IsChecked == true;
         }
 
         private void PauseButton_Click(object sender, RoutedEventArgs e)
@@ -231,6 +283,9 @@ namespace NaiveGrainGrowSimulation
             StartButton.IsEnabled = true;
             PauseButton.IsEnabled = !PauseButton.IsEnabled;
             ClearButton.IsEnabled = true;
+
+            _controller.ResetFlag = !_controller.ResetFlag;
+            _allSteps = false;
         }
 
         private void ClearButton_Click(object sender, RoutedEventArgs e)
@@ -241,11 +296,10 @@ namespace NaiveGrainGrowSimulation
             StartButton.IsEnabled = true;
             PauseButton.IsEnabled = false;
 
-
             _addedGrainNumber = 0;
             
             ClearBoard();
-            
+            SetStepOption();
         }
 
         private void FitButton_Click(object sender, RoutedEventArgs e)
@@ -260,7 +314,6 @@ namespace NaiveGrainGrowSimulation
 
         }
 
-
         private void BoardCanvas_Loaded(object sender, RoutedEventArgs e)
         {
             SetResponsiveCanvas();
@@ -268,7 +321,7 @@ namespace NaiveGrainGrowSimulation
 
         private void BoardCanvas_MouseDown(object sender, MouseButtonEventArgs e)
         {
-            if (_addedGrainNumber < _settings.GrainNumber && _option==GrainGrow.Click)
+            if (_addedGrainNumber < _settings.GrainNumber && _settings.Option==GrainGrow.Click)
             {
                 var p = e.GetPosition(BoardCanvas);
 
@@ -276,8 +329,110 @@ namespace NaiveGrainGrowSimulation
 
                 _addedGrainNumber++;
             }
-
-            
         }
+
+        private void TypeComboBox_Initialized(object sender, EventArgs e)
+        {
+            TypeComboBox.ItemsSource = Enum.GetValues(typeof(NeighborhoodType)).Cast<NeighborhoodType>();
+        }
+
+        private void Button_Click_1(object sender, RoutedEventArgs e)
+        {
+            _controller.PerformIterations(_allSteps);
+        }
+
+        private void EdgeComboBox_Initialized(object sender, EventArgs e)
+        {
+            EdgeComboBox.ItemsSource = Enum.GetValues(typeof(EdgeCondition)).Cast<EdgeCondition>();
+        }
+
+        private void SaveButton_Click(object sender, RoutedEventArgs e)
+        {
+            var dialog = new SaveFileDialog
+            {
+                Filter = "PNG Image (*.png) |*.png |All files |*.*",
+                RestoreDirectory = true
+            };
+
+            var size = BoardCanvas.RenderSize;
+            RenderTargetBitmap rtb = new RenderTargetBitmap((int)size.Width, (int) size.Height,96d,96d,PixelFormats.Pbgra32);
+            BoardCanvas.Measure(size);
+            BoardCanvas.Arrange(new Rect(size));
+            rtb.Render(BoardCanvas);
+            var pngEncoderr = new PngBitmapEncoder();
+            pngEncoderr.Frames.Add(BitmapFrame.Create(rtb));
+            
+            MemoryStream ms;
+            using ( ms = new MemoryStream())
+            {
+                pngEncoderr.Save(ms);
+            }
+
+            if (dialog.ShowDialog() == true)
+            {
+                if (dialog.FilterIndex ==1)
+                {
+                    File.WriteAllBytes(dialog.FileName, ms.ToArray());
+                }
+
+
+            }
+        }
+
+        private void SaveSettingsAs_Click(object sender, RoutedEventArgs e)
+        {
+            var dialog = new SaveFileDialog
+            {
+                Filter = "Json file (*.json) |*.json |All files |*.*",
+                RestoreDirectory = true
+            };
+            if (dialog.ShowDialog() == true)
+            {
+                if (dialog.FilterIndex == 1)
+                {
+                    var jsonFormatter = new JsonFormatter(_settings);
+                    File.WriteAllText(dialog.FileName, jsonFormatter.Serialize());
+                }
+            }
+        }
+
+        private void LoadSettings_Click(object sender, RoutedEventArgs e)
+        {
+            var dialog = new OpenFileDialog
+            {
+                Filter = "Json file (*.json) |*.json |All files |*.*",
+                CheckFileExists = true,
+                CheckPathExists = true,
+                ReadOnlyChecked = true,
+                FilterIndex = 2
+            };
+
+            if (dialog.ShowDialog() == true)
+            {
+                try
+                {
+                    string text = string.Empty;
+                    using (var sr = new StreamReader(dialog.FileName))
+                    {
+                        text = sr.ReadToEnd();
+                    }
+                    ///TODO validate input settings
+                    _settings = JsonFormatter.Deserialize(text);
+
+                    InitializeSettings();
+                    //SetResponsiveCanvas();
+                    
+                    Button_Click(sender,e);
+
+                }
+                catch (Exception)
+                {
+                    MessageBox.Show($"Wrong file");
+                }
+            }
+
+        }
+
+
     }
 }
