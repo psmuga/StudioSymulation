@@ -383,7 +383,8 @@ namespace NaiveGrainGrowSimulation
         {
             var dialog = new SaveFileDialog
             {
-                Filter = "Json file (*.json) |*.json |All files |*.*",
+                Filter = "Settings (*.json) |*.json |Structure (*.json) |*.json |All files |*.*",
+                
                 RestoreDirectory = true
             };
             if (dialog.ShowDialog() == true)
@@ -392,6 +393,17 @@ namespace NaiveGrainGrowSimulation
                 {
                     var jsonFormatter = new JsonFormatter(_settings);
                     File.WriteAllText(dialog.FileName, jsonFormatter.Serialize());
+                }
+                else if (dialog.FilterIndex ==2)
+                {
+                    var dupa = new int[3,4]
+                    {
+                        {1,2,3,4},
+                        { 5,6,7,10},
+                        { 8,9,0,11}
+                    };
+                    var jsonString = JsonFormatter.Serialize(_controller.GetStructure());
+                    File.WriteAllText(dialog.FileName, jsonString);
                 }
             }
         }

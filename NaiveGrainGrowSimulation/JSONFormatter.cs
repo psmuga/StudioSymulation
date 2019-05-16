@@ -24,5 +24,19 @@ namespace NaiveGrainGrowSimulation
         {
             return JsonConvert.DeserializeObject<Settings>(json);
         }
+
+        public static string Serialize(Cell[,] table)
+        {
+
+            return JsonConvert.SerializeObject(table, Formatting.None,new JsonSerializerSettings()
+            {
+                ReferenceLoopHandling = ReferenceLoopHandling.Ignore
+            });
+        }
+        public static string Serialize(int[,] table)
+        {
+            return JsonConvert.SerializeObject(table, Formatting.Indented);
+        }
+
     }
 }

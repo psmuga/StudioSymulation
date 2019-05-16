@@ -24,6 +24,7 @@ namespace NaiveGrainGrowSimulation
         public bool ResetFlag { get; set; } = false;
         public bool Finished { get; set; } = false;
 
+        private static int IDCounter = 1;
 
 
         public Controller(Settings settings, Canvas canvas)
@@ -31,10 +32,17 @@ namespace NaiveGrainGrowSimulation
             _rand = new Random();
             _settings = settings;
             _boardCanvas = canvas;
+            IDCounter = 1;
+        }
+
+        public Cell[,] GetStructure()
+        {
+            return _fields;
         }
 
         public void InitialiseTable()
         {
+            IDCounter = 1;
             _fields = new Cell[_settings.NetHeight+2, _settings.NetWidth+2];
             _newFields = new Cell[_settings.NetHeight + 2, _settings.NetWidth + 2];
             for (int i = 0; i < _settings.NetHeight+2; i++)
@@ -65,6 +73,8 @@ namespace NaiveGrainGrowSimulation
                     r.Fill = color;
                     _fields[i, j].MyRectangle = r;
                     _fields[i, j].MyBrush = color;
+                    _fields[i, j].Id = IDCounter;
+                    IDCounter++;
 
                     _boardCanvas.Children.Add(_fields[i, j].MyRectangle);
                     Canvas.SetLeft(_fields[i, j].MyRectangle, (j-1) * _settings.CellSize);
@@ -89,6 +99,8 @@ namespace NaiveGrainGrowSimulation
                     r.Fill = color;
                     _fields[i, j].MyRectangle = r;
                     _fields[i, j].MyBrush = color;
+                    _fields[i, j].Id = IDCounter;
+                    IDCounter++;
 
                     _boardCanvas.Children.Add(_fields[i, j].MyRectangle);
                     Canvas.SetLeft(_fields[i, j].MyRectangle, (j - 1) * _settings.CellSize);
@@ -111,6 +123,9 @@ namespace NaiveGrainGrowSimulation
             r.Fill = color;
             _fields[i, j].MyRectangle = r;
             _fields[i, j].MyBrush = color;
+            _fields[i, j].Id = IDCounter;
+            IDCounter++;
+
 
             _boardCanvas.Children.Add(_fields[i, j].MyRectangle);
             Canvas.SetLeft(_fields[i, j].MyRectangle, (j - 1) * _settings.CellSize);
@@ -181,7 +196,8 @@ namespace NaiveGrainGrowSimulation
                     r.Fill = color;
                     _fields[i, j].MyRectangle = r;// SetRectangle(r);
                     _fields[i, j].MyBrush = color;
-
+                    _fields[i, j].Id = IDCounter;
+                    IDCounter++;
 
                     _boardCanvas.Children.Add(_fields[i, j].MyRectangle);
                     Canvas.SetLeft(_fields[i, j].MyRectangle, (j - 1) * _settings.CellSize);
@@ -192,8 +208,6 @@ namespace NaiveGrainGrowSimulation
                 }
             }
         }
-
-
 
         public void PerformIterations(bool toEnd = false)
         {
@@ -208,7 +222,6 @@ namespace NaiveGrainGrowSimulation
                 _timer.Start();
             }
         }
-
 
         private void RandSideHexaRandom(int i, int j)
         {
@@ -232,8 +245,6 @@ namespace NaiveGrainGrowSimulation
 
         private void PerformIteration()
         {
-
-            
             ///TODO czy na pewno to tutaj potrzebne
             /// 
             for (int i = 0; i < _settings.NetHeight + 2; i++)
@@ -244,6 +255,7 @@ namespace NaiveGrainGrowSimulation
                     _newFields[i, j].MyRectangle = _fields[i, j].MyRectangle;
                     _newFields[i, j].MyBrush = _fields[i, j].MyBrush;
                     _newFields[i, j].Orientation = _fields[i, j].Orientation;
+                    _newFields[i, j].Id = _fields[i, j].Id;
                 }
             }
 
@@ -317,6 +329,7 @@ namespace NaiveGrainGrowSimulation
             _newFields[i + m1, j + m2].MyBrush = _fields[i, j].MyBrush;
             _newFields[i + m1, j + m2].MyRectangle = _fields[i, j].MyRectangle;
             _newFields[i + m1, j + m2].Orientation = _fields[i, j].Orientation;
+            _newFields[i + m1, j + m2].Id = _fields[i, j].Id;
         }
 
         private void HexaLeft(int i, int j)
@@ -501,6 +514,7 @@ namespace NaiveGrainGrowSimulation
                     _fields[i, j].MyRectangle = _newFields[i, j].MyRectangle;
                     _fields[i, j].MyBrush = _newFields[i, j].MyBrush;
                     _fields[i, j].Orientation = _newFields[i, j].Orientation;
+                    _fields[i, j].Id = _newFields[i, j].Id;
                 }
             }
 
@@ -521,6 +535,7 @@ namespace NaiveGrainGrowSimulation
                     
                     r.Fill = _fields[i,j].MyBrush;
                     _fields[i, j].MyRectangle = r;
+                    //aware of id
 
 
                     _boardCanvas.Children.Add(_fields[i, j].MyRectangle);
@@ -541,7 +556,7 @@ namespace NaiveGrainGrowSimulation
         private void ClearBoardView()
         {
             _boardCanvas.Children.Clear();
-
+            
         }
 
         private void IsTableClear()
